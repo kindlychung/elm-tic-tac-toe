@@ -5182,6 +5182,9 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$Computer = {$: 'Computer'};
+var $author$project$Main$Occupied = function (a) {
+	return {$: 'Occupied', a: a};
+};
 var $author$project$Main$Player = {$: 'Player'};
 var $author$project$Main$Unknown = {$: 'Unknown'};
 var $author$project$Main$Unoccupied = {$: 'Unoccupied'};
@@ -5425,7 +5428,9 @@ var $author$project$Main$init = function (turnInt) {
 						$author$project$Main$fourUnoccupied,
 						$elm$core$Array$fromList(
 							_List_fromArray(
-								[$author$project$Main$Computer]))),
+								[
+									$author$project$Main$Occupied($author$project$Main$Computer)
+								]))),
 					$author$project$Main$fourUnoccupied),
 				winner: $author$project$Main$Unknown
 			},
@@ -5447,8 +5452,9 @@ var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
 var $author$project$Main$ComputerPut = {$: 'ComputerPut'};
-var $author$project$Main$ComputerW = {$: 'ComputerW'};
-var $author$project$Main$PlayerW = {$: 'PlayerW'};
+var $author$project$Main$Winner = function (a) {
+	return {$: 'Winner', a: a};
+};
 var $elm$core$Array$getHelp = F3(
 	function (shift, index, tree) {
 		getHelp:
@@ -5888,13 +5894,13 @@ var $elm_community$maybe_extra$Maybe$Extra$orElseLazy = F2(
 		}
 	});
 var $author$project$Main$getKillingPos = F2(
-	function (turn, model) {
+	function (piece, model) {
 		return A2(
 			$elm_community$maybe_extra$Maybe$Extra$orElseLazy,
 			function (_v6) {
 				return A2(
 					$author$project$Main$getKillingPosFromLine,
-					turn,
+					piece,
 					$elm$core$Array$toList(
 						$author$project$Main$getDiag2Indexed(model.pieces)));
 			},
@@ -5903,7 +5909,7 @@ var $author$project$Main$getKillingPos = F2(
 				function (_v5) {
 					return A2(
 						$author$project$Main$getKillingPosFromLine,
-						turn,
+						piece,
 						$elm$core$Array$toList(
 							$author$project$Main$getDiag1Indexed(model.pieces)));
 				},
@@ -5912,7 +5918,7 @@ var $author$project$Main$getKillingPos = F2(
 					function (_v4) {
 						return A2(
 							$author$project$Main$getKillingPosFromLine,
-							turn,
+							piece,
 							$elm$core$Array$toList(
 								$author$project$Main$getCol3Indexed(model.pieces)));
 					},
@@ -5921,7 +5927,7 @@ var $author$project$Main$getKillingPos = F2(
 						function (_v3) {
 							return A2(
 								$author$project$Main$getKillingPosFromLine,
-								turn,
+								piece,
 								$elm$core$Array$toList(
 									$author$project$Main$getCol2Indexed(model.pieces)));
 						},
@@ -5930,7 +5936,7 @@ var $author$project$Main$getKillingPos = F2(
 							function (_v2) {
 								return A2(
 									$author$project$Main$getKillingPosFromLine,
-									turn,
+									piece,
 									$elm$core$Array$toList(
 										$author$project$Main$getCol1Indexed(model.pieces)));
 							},
@@ -5939,7 +5945,7 @@ var $author$project$Main$getKillingPos = F2(
 								function (_v1) {
 									return A2(
 										$author$project$Main$getKillingPosFromLine,
-										turn,
+										piece,
 										$elm$core$Array$toList(
 											$author$project$Main$getRow3Indexed(model.pieces)));
 								},
@@ -5948,13 +5954,13 @@ var $author$project$Main$getKillingPos = F2(
 									function (_v0) {
 										return A2(
 											$author$project$Main$getKillingPosFromLine,
-											turn,
+											piece,
 											$elm$core$Array$toList(
 												$author$project$Main$getRow2Indexed(model.pieces)));
 									},
 									A2(
 										$author$project$Main$getKillingPosFromLine,
-										turn,
+										piece,
 										$elm$core$Array$toList(
 											$author$project$Main$getRow1Indexed(model.pieces))))))))));
 	});
@@ -6012,7 +6018,7 @@ var $author$project$Main$getUnoccupiedEdge = function (model) {
 				},
 				A2($author$project$Main$getUnoccupiedIndex, 1, model.pieces))));
 };
-var $author$project$Main$None = {$: 'None'};
+var $author$project$Main$Draw = {$: 'Draw'};
 var $author$project$Main$getLine = F4(
 	function (i, j, k, turns) {
 		return $elm$core$Array$fromList(
@@ -6137,7 +6143,13 @@ var $author$project$Main$noStepLeft = function (model) {
 		$elm$core$Array$toList(model.pieces));
 };
 var $author$project$Main$getWinner = function (model) {
-	return A2($author$project$Main$hasWon, $author$project$Main$Player, model) ? $author$project$Main$PlayerW : (A2($author$project$Main$hasWon, $author$project$Main$Computer, model) ? $author$project$Main$ComputerW : ($author$project$Main$noStepLeft(model) ? $author$project$Main$None : $author$project$Main$Unknown));
+	return A2(
+		$author$project$Main$hasWon,
+		$author$project$Main$Occupied($author$project$Main$Player),
+		model) ? $author$project$Main$Winner($author$project$Main$Player) : (A2(
+		$author$project$Main$hasWon,
+		$author$project$Main$Occupied($author$project$Main$Computer),
+		model) ? $author$project$Main$Winner($author$project$Main$Computer) : ($author$project$Main$noStepLeft(model) ? $author$project$Main$Draw : $author$project$Main$Unknown));
 };
 var $GlobalWebIndex$cmd_extra$Cmd$Extra$perform = A2(
 	$elm$core$Basics$composeL,
@@ -6190,31 +6202,37 @@ var $author$project$Main$update = F2(
 		if (msg.$ === 'PlayerPut') {
 			var position = msg.a;
 			var _v1 = model.nextTurn;
-			switch (_v1.$) {
-				case 'Player':
-					var newModel = _Utils_update(
-						model,
-						{
-							nextTurn: $author$project$Main$Computer,
-							pieces: A3($elm$core$Array$set, position, $author$project$Main$Player, model.pieces)
-						});
-					var newModel1 = _Utils_update(
-						newModel,
-						{
-							winner: $author$project$Main$getWinner(newModel)
-						});
-					return _Utils_Tuple2(
-						newModel1,
-						_Utils_eq(newModel1.winner, $author$project$Main$PlayerW) ? $elm$core$Platform$Cmd$none : $GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$ComputerPut));
-				case 'Computer':
-					return _Utils_Tuple2(
-						model,
-						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$ComputerPut));
-				default:
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			if (_v1.$ === 'Player') {
+				var newModel = _Utils_update(
+					model,
+					{
+						nextTurn: $author$project$Main$Computer,
+						pieces: A3(
+							$elm$core$Array$set,
+							position,
+							$author$project$Main$Occupied($author$project$Main$Player),
+							model.pieces)
+					});
+				var newModel1 = _Utils_update(
+					newModel,
+					{
+						winner: $author$project$Main$getWinner(newModel)
+					});
+				return _Utils_Tuple2(
+					newModel1,
+					_Utils_eq(
+						newModel1.winner,
+						$author$project$Main$Winner($author$project$Main$Player)) ? $elm$core$Platform$Cmd$none : $GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$ComputerPut));
+			} else {
+				return _Utils_Tuple2(
+					model,
+					$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$ComputerPut));
 			}
 		} else {
-			var _v2 = A2($author$project$Main$getKillingPos, $author$project$Main$Computer, model);
+			var _v2 = A2(
+				$author$project$Main$getKillingPos,
+				$author$project$Main$Occupied($author$project$Main$Computer),
+				model);
 			if (_v2.$ === 'Just') {
 				var idx = _v2.a;
 				return _Utils_Tuple2(
@@ -6222,12 +6240,19 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							nextTurn: $author$project$Main$Player,
-							pieces: A3($elm$core$Array$set, idx, $author$project$Main$Computer, model.pieces),
-							winner: $author$project$Main$ComputerW
+							pieces: A3(
+								$elm$core$Array$set,
+								idx,
+								$author$project$Main$Occupied($author$project$Main$Computer),
+								model.pieces),
+							winner: $author$project$Main$Winner($author$project$Main$Computer)
 						}),
 					$elm$core$Platform$Cmd$none);
 			} else {
-				var _v3 = A2($author$project$Main$getKillingPos, $author$project$Main$Player, model);
+				var _v3 = A2(
+					$author$project$Main$getKillingPos,
+					$author$project$Main$Occupied($author$project$Main$Player),
+					model);
 				if (_v3.$ === 'Just') {
 					var idx = _v3.a;
 					return _Utils_Tuple2(
@@ -6235,7 +6260,11 @@ var $author$project$Main$update = F2(
 							model,
 							{
 								nextTurn: $author$project$Main$Player,
-								pieces: A3($elm$core$Array$set, idx, $author$project$Main$Computer, model.pieces)
+								pieces: A3(
+									$elm$core$Array$set,
+									idx,
+									$author$project$Main$Occupied($author$project$Main$Computer),
+									model.pieces)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -6247,7 +6276,11 @@ var $author$project$Main$update = F2(
 								model,
 								{
 									nextTurn: $author$project$Main$Player,
-									pieces: A3($elm$core$Array$set, 4, $author$project$Main$Computer, model.pieces)
+									pieces: A3(
+										$elm$core$Array$set,
+										4,
+										$author$project$Main$Occupied($author$project$Main$Computer),
+										model.pieces)
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
@@ -6259,7 +6292,11 @@ var $author$project$Main$update = F2(
 									model,
 									{
 										nextTurn: $author$project$Main$Player,
-										pieces: A3($elm$core$Array$set, idx, $author$project$Main$Computer, model.pieces)
+										pieces: A3(
+											$elm$core$Array$set,
+											idx,
+											$author$project$Main$Occupied($author$project$Main$Computer),
+											model.pieces)
 									}),
 								$elm$core$Platform$Cmd$none);
 						} else {
@@ -6271,7 +6308,11 @@ var $author$project$Main$update = F2(
 										model,
 										{
 											nextTurn: $author$project$Main$Player,
-											pieces: A3($elm$core$Array$set, idx, $author$project$Main$Computer, model.pieces)
+											pieces: A3(
+												$elm$core$Array$set,
+												idx,
+												$author$project$Main$Occupied($author$project$Main$Computer),
+												model.pieces)
 										}),
 									$elm$core$Platform$Cmd$none);
 							} else {
@@ -11982,13 +12023,16 @@ var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
 var $author$project$Main$computerPiece = 'o';
 var $author$project$Main$playerPiece = 'x';
 var $author$project$Main$symbol = function (turn) {
-	switch (turn.$) {
-		case 'Player':
+	if (turn.$ === 'Occupied') {
+		if (turn.a.$ === 'Player') {
+			var _v1 = turn.a;
 			return $author$project$Main$playerPiece;
-		case 'Computer':
+		} else {
+			var _v2 = turn.a;
 			return $author$project$Main$computerPiece;
-		default:
-			return ' ';
+		}
+	} else {
+		return ' ';
 	}
 };
 var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
@@ -11998,7 +12042,7 @@ var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
 var $author$project$Main$pieceHolder = F2(
-	function (idx, turn) {
+	function (idx, piece) {
 		return A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
@@ -12022,7 +12066,7 @@ var $author$project$Main$pieceHolder = F2(
 				_List_fromArray(
 					[$mdgriffith$elm_ui$Element$centerX, $mdgriffith$elm_ui$Element$centerY]),
 				$mdgriffith$elm_ui$Element$text(
-					$author$project$Main$symbol(turn))));
+					$author$project$Main$symbol(piece))));
 	});
 var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
 var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
@@ -12137,11 +12181,15 @@ var $author$project$Main$board = function (model) {
 					function () {
 						var _v0 = model.winner;
 						switch (_v0.$) {
-							case 'PlayerW':
-								return 'Human won!';
-							case 'ComputerW':
-								return 'Computer won!';
-							case 'None':
+							case 'Winner':
+								if (_v0.a.$ === 'Player') {
+									var _v1 = _v0.a;
+									return 'Human won!';
+								} else {
+									var _v2 = _v0.a;
+									return 'Computer won!';
+								}
+							case 'Draw':
 								return 'It\'s a draw!';
 							default:
 								return '...';
